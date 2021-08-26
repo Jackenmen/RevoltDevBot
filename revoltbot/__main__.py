@@ -1,8 +1,10 @@
 import asyncio
 import logging
 import os
+import sys
 import warnings
 from pprint import pprint
+from types import TracebackType
 
 from dotenv import load_dotenv
 from mutiny import Client, events
@@ -25,11 +27,29 @@ client = Client(
     user_id=os.getenv("REVOLTBOT_USER_ID"),
     session_token=os.getenv("REVOLTBOT_SESSION_TOKEN"),
 )
-logging.basicConfig(
-    format="[%(asctime)s] [%(levelname)s] %(name)s: %(message)s",
-    datefmt="%Y-%m-%d %H:%M:%S",
-    level=logging.INFO,
-)
+
+
+def excepthook(
+    type: type[BaseException], value: BaseException, traceback: TracebackType
+) -> None:
+    log.critical("Unhandled exception occurred", exc_info=(type_, value, traceback))
+
+
+def setup_logging():
+    root_logger = logging.getLogger()
+    root_logger.setLevel(logging.DEBUG)
+    file_handler = logging.FileHandler("latest.log")
+    formatter = logging.Formatter(
+        "[%(asctime)s] [%(levelname)s] %(name)s: %(message)s", datefmt="%X"
+    )
+    file_handler.setFormatter(formatter)
+    root_logger.addHandler(file_handler)
+    stream_handler = logging.StreamHandler()
+    root_logger.addHandler(stream_handler)
+    sys.excepthook = excepthook
+
+
+setup_logging()
 log = logging.getLogger("revoltbot")
 
 
@@ -125,7 +145,7 @@ def main() -> None:
         try:
             loop.run_until_complete(client.close())
             _cancel_all_tasks(loop)
-            loop.run_until_complete(asyncio.sleep(1))
+            loop.run_until_complete(asyncio.sleep(5))
             loop.run_until_complete(loop.shutdown_asyncgens())
             loop.run_until_complete(loop.shutdown_default_executor())
         finally:
