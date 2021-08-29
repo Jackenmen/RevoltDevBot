@@ -101,6 +101,10 @@ async def on_message(event: events.MessageEvent):
     if command == f"{PREFIX}ping":
         await send(client, msg.channel_id, "Pong!")
         return
+    if command == f"{PREFIX}shutdown":
+        await send(client, msg.channel_id, "Shutting down...")
+        await client.close()
+        return
 
     if not body:
         return
