@@ -30,7 +30,7 @@ client = Client(
 
 
 def excepthook(
-    type: type[BaseException], value: BaseException, traceback: TracebackType
+    type_: type[BaseException], value: BaseException, traceback: TracebackType
 ) -> None:
     log.critical("Unhandled exception occurred", exc_info=(type_, value, traceback))
 
