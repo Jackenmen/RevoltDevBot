@@ -12,21 +12,19 @@ from ulid import monotonic as ulid
 
 from .dev import Dev
 
-if os.path.isfile(".env.user"):
-    load_dotenv(".env.user")
-else:
-    load_dotenv()
+load_dotenv()
+load_dotenv(".env.user")
 
 warnings.filterwarnings("default", category=DeprecationWarning)
 
 PREFIX = os.environ["REVOLTBOT_PREFIX"]
 if len(PREFIX.split()) != 1:
     raise RuntimeError("can't have prefix with spaces")
-client = Client(
-    token=os.getenv("REVOLTBOT_TOKEN"),
-    user_id=os.getenv("REVOLTBOT_USER_ID"),
-    session_token=os.getenv("REVOLTBOT_SESSION_TOKEN"),
-)
+
+if bool(int(os.getenv("REVOLTBOT_IS_USER", 0))):
+    client = Client(session_token=os.environ["REVOLTBOT_TOKEN"])
+else:
+    client = Client(token=os.environ["REVOLTBOT_TOKEN"])
 
 
 def excepthook(
