@@ -73,7 +73,11 @@ async def send(client: Client, channel_id: str, content: str) -> None:
 
 @client.listen()
 async def on_event(event: events.Event):
-    if type(event) in (events.ChannelStartTypingEvent, events.ChannelStopTypingEvent):
+    if type(event) in (
+        events.ChannelStartTypingEvent,
+        events.ChannelStopTypingEvent,
+        events.UserUpdateEvent,
+    ):
         return
     pprint(event.raw_data)
 
